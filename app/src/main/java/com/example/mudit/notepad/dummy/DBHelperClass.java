@@ -71,11 +71,28 @@ public class DBHelperClass extends SQLiteOpenHelper {
         Cursor result = db.rawQuery("Select * from "+Table_Name, null);
         while(result.moveToNext())
         {
-            temp = new DummyContent.Note(result.getString(0),result.getString(1),result.getString(2));
+            temp = new DummyContent.Note(result.getString(0),result.getString(1),result.getString(2),null);
             DummyContent.ITEMS.add(temp);
             DummyContent.ITEM_MAP.put(temp.id, temp);
         }
         return result;
+    }
+
+    public boolean updateData(Integer ID,String ititle, String inote, String picpath) {
+        ContentValues values = new ContentValues();
+        values.put(title, ititle);
+        values.put(note, inote);
+        values.put(pics, picpath + ",");
+        db.update(Table_Name, values, "_ID = ?", new String[]{String.valueOf(ID)});
+        return true;
+    }
+
+    public boolean deletedata(String id)
+    {
+       int i=db.delete(Table_Name, "_ID=?", new String[]{id});
+       if(i!=0)
+           return true;
+       else return false;
     }
 }
 

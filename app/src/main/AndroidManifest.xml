@@ -28,7 +28,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.mudit.notepad.noteListActivity" />
         </activity>
-        <activity android:name=".NewNoteActivity"></activity>
+        <activity android:name=".NewNoteActivity" />
     </application>
 
 </manifest>

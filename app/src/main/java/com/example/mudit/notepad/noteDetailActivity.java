@@ -5,11 +5,15 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.View;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.example.mudit.notepad.dummy.DBHelperClass;
 
 /**
  * An activity representing a single note detail screen. This
@@ -19,19 +23,23 @@ import android.view.MenuItem;
  */
 public class noteDetailActivity extends AppCompatActivity {
 
+    private DBHelperClass dbHelperClass;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
+        dbHelperClass = new DBHelperClass(this);
+        dbHelperClass.open();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent(noteDetailActivity.this, NewNoteActivity.class);
+                intent.putExtra(NewNoteActivity.ARG_ITEM_ID, getIntent().getStringExtra(noteDetailFragment.ARG_ITEM_ID));
+                startActivity(intent);
             }
         });
 
@@ -50,7 +58,8 @@ public class noteDetailActivity extends AppCompatActivity {
         //
         // http://developer.android.com/guide/components/fragments.html
         //
-        if (savedInstanceState == null) {
+
+    if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
@@ -62,6 +71,12 @@ public class noteDetailActivity extends AppCompatActivity {
                     .add(R.id.note_detail_container, fragment)
                     .commit();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.detail_note_menu,menu);
+        return true;
     }
 
     @Override
@@ -78,6 +93,22 @@ public class noteDetailActivity extends AppCompatActivity {
             NavUtils.navigateUpTo(this, new Intent(this, noteListActivity.class));
             return true;
         }
+        else if (id== R.id.del)
+        {
+            if(dbHelperClass.deletedata(getIntent().getStringExtra(noteDetailFragment.ARG_ITEM_ID)))
+            {
+                finish();
+                Toast.makeText(noteDetailActivity.this, "Note Deleted Successfully", Toast.LENGTH_LONG).show();
+            }
+            else
+                Toast.makeText(noteDetailActivity.this, "Note Deletion failed", Toast.LENGTH_LONG).show();
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dbHelperClass.close();
     }
 }
