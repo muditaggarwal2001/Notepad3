@@ -111,14 +111,14 @@ public class NewNoteActivity extends AppCompatActivity {
 
             case R.id.undo: setToPrevText();
                 break;
-            case R.id.photo: //openGallery();
+            case R.id.photo: openGallery();
 
-                photo.setOnClickListener(new View.OnClickListener() {
+                /**photo.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         openGallery();
                     }
-                });
+                });*/
 
 
         }
