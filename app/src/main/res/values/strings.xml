@@ -3,4 +3,7 @@
     <string name="title_note_list">notes</string>
     <string name="title_note_detail">note Detail</string>
     <string name="photo">photo</string>
+    <string name="title">Title</string>
+    <string name="note">Note</string>
+
 </resources>

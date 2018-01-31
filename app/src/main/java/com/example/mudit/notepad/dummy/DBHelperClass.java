@@ -82,7 +82,7 @@ public class DBHelperClass extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(title, ititle);
         values.put(note, inote);
-        values.put(pics, picpath + ",");
+        values.put(pics, picpath);
         db.update(Table_Name, values, "_ID = ?", new String[]{String.valueOf(ID)});
         return true;
     }

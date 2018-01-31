@@ -5,10 +5,12 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +23,9 @@ import com.example.mudit.notepad.dummy.DummyContent;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class NewNoteActivity extends AppCompatActivity {
     private long noteid;
@@ -147,18 +152,28 @@ public class NewNoteActivity extends AppCompatActivity {
             case R.id.undo: setToPrevText();
                 break;
             case R.id.photo: openGallery();
+                        break;
+            case R.id.share:
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+                emailIntent.setType("text/plain");
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT,title.getText().toString());
+                emailIntent.putExtra(Intent.EXTRA_TEXT,note.getText().toString() );
+                startActivity(Intent.createChooser(emailIntent, "Send Email..."));
+                    break;
 
-                /**photo.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        openGallery();
-                    }
-                });*/
 
 
         }
         return true;
     }
+
+    public void openCamera(){
+        Intent cameraIntent=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+        startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
+    }
+
     public void openGallery(){
         Intent gallery=new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(gallery, PICK_IMAGE);
@@ -249,16 +264,57 @@ public class NewNoteActivity extends AppCompatActivity {
     }
 
     /**
+     * Creating file uri to store image/video
+     */
+    public Uri getOutputMediaFileUri(int type) {
+        return Uri.fromFile(getOutputMediaFile(type));
+    }
+
+    /**
+     * returning image / video
+     */
+    private static File getOutputMediaFile(int type) {
+
+        // External sdcard location
+        File mediaStorageDir = new File(
+                Environment
+                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                IMAGE_DIRECTORY_NAME);
+
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Log.d(IMAGE_DIRECTORY_NAME, "Oops! Failed to create "
+                        + IMAGE_DIRECTORY_NAME + " directory");
+                return null;
+            }
+        }
+
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
+                Locale.getDefault()).format(new Date());
+        File mediaFile;
+        if (type == MEDIA_TYPE_IMAGE) {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator
+                    + "IMG_" + timeStamp + ".jpg");
+        }  else {
+            return null;
+        }
+
+        return mediaFile;
+    }
+
+    /**
      * Here we store the file url as it will be null after returning from camera
      * app
      */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
         // save file url in bundle as it will be null on scren orientation
         // changes
-        outState.putParcelable("file_uri", fileUri);
+        outState.putParcelable("BitmapImage", bitmap);
+       // outState.putParcelable("file_uri", fileUri);
     }
 
     /*
@@ -267,9 +323,16 @@ public class NewNoteActivity extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+        Bitmap bmpi = savedInstanceState.getParcelable("BitmapImage");
+        if(bmpi!=null) {
+            imageview2.setVisibility(View.VISIBLE);
+            imageview2.setImageBitmap(bmpi);
+        }// get the file url
+        else {
 
-        // get the file url
-        fileUri = savedInstanceState.getParcelable("file_uri");
+            imageview2.setVisibility(View.INVISIBLE);
+        }//fileUri = savedInstanceState.getParcelable("file_uri");
+
     }
 
     public String getStringImage(Bitmap bmp){

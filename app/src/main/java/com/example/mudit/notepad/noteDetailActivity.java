@@ -1,19 +1,26 @@
 package com.example.mudit.notepad;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.View;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.mudit.notepad.dummy.DBHelperClass;
+import com.example.mudit.notepad.dummy.DummyContent;
+
+import static com.example.mudit.notepad.noteDetailFragment.ARG_ITEM_ID;
 
 /**
  * An activity representing a single note detail screen. This
@@ -33,12 +40,13 @@ public class noteDetailActivity extends AppCompatActivity {
         dbHelperClass = new DBHelperClass(this);
         dbHelperClass.open();
 
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(noteDetailActivity.this, NewNoteActivity.class);
-                intent.putExtra(NewNoteActivity.ARG_ITEM_ID, getIntent().getStringExtra(noteDetailFragment.ARG_ITEM_ID));
+                intent.putExtra(NewNoteActivity.ARG_ITEM_ID, getIntent().getStringExtra(ARG_ITEM_ID));
                 startActivity(intent);
             }
         });
@@ -63,8 +71,8 @@ public class noteDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putString(noteDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(noteDetailFragment.ARG_ITEM_ID));
+            arguments.putString(ARG_ITEM_ID,
+                    getIntent().getStringExtra(ARG_ITEM_ID));
             noteDetailFragment fragment = new noteDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
@@ -95,7 +103,7 @@ public class noteDetailActivity extends AppCompatActivity {
         }
         else if (id== R.id.del)
         {
-            if(dbHelperClass.deletedata(getIntent().getStringExtra(noteDetailFragment.ARG_ITEM_ID)))
+            if(dbHelperClass.deletedata(getIntent().getStringExtra(ARG_ITEM_ID)))
             {
                 finish();
                 Toast.makeText(noteDetailActivity.this, "Note Deleted Successfully", Toast.LENGTH_LONG).show();
