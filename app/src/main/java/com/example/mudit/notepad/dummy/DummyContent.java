@@ -48,5 +48,9 @@ public class DummyContent {
         public String toString() {
             return content;
         }
+
+        public String getPicpath() {
+            return picpath;
+        }
     }
 }

@@ -58,7 +58,7 @@ public class DBHelperClass extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(title,ititle);
         values.put(note,inote);
-        values.put(pics,picpath+",");
+        values.put(pics,picpath);
         long result=db.insert(Table_Name,null,values);
         return result;
     }
@@ -71,7 +71,7 @@ public class DBHelperClass extends SQLiteOpenHelper {
         Cursor result = db.rawQuery("Select * from "+Table_Name, null);
         while(result.moveToNext())
         {
-            temp = new DummyContent.Note(result.getString(0),result.getString(1),result.getString(2),null);
+            temp = new DummyContent.Note(result.getString(0),result.getString(1),result.getString(2),result.getString(3));
             DummyContent.ITEMS.add(temp);
             DummyContent.ITEM_MAP.put(temp.id, temp);
         }

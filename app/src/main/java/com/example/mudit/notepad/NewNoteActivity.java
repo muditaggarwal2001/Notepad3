@@ -27,7 +27,7 @@ public class NewNoteActivity extends AppCompatActivity {
     private DBHelperClass dbHelperClass;
     private EditText title;
     private EditText note;
-    private String prevTitle, prevnote;
+    private String prevTitle, prevnote, previmage;
     private DummyContent.Note temp;
     public static final String ARG_ITEM_ID = "item_id";
     private static final int PICK_IMAGE=1;
@@ -52,19 +52,21 @@ public class NewNoteActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_note);
-        imageview2 = (ImageView)findViewById(R.id.photo);
+        imageview2 = (ImageView)findViewById(R.id.imageView2);
         photo= (Button)findViewById(R.id.photo);
         title = (EditText)findViewById(R.id.note_title);
         note= (EditText)findViewById(R.id.note_desc);
         noteid=-2;
         prevnote="";
         prevTitle="";
+        previmage="";
         if(getIntent().hasExtra(ARG_ITEM_ID))
         {
             noteid = Integer.parseInt(getIntent().getStringExtra(ARG_ITEM_ID));
             temp = DummyContent.ITEM_MAP.get(Long.toString(noteid));
             prevnote=temp.getDetails();
             prevTitle=temp.toString();
+            previmage = temp.getPicpath();
             setToPrevText();
         }
 
@@ -77,6 +79,18 @@ public class NewNoteActivity extends AppCompatActivity {
     {
         title.setText(prevTitle);
         note.setText(prevnote);
+        if (!previmage.equals("")) {
+
+            byte[] imgbytes = Base64.decode(previmage,Base64.NO_WRAP);
+            Bitmap bmp = BitmapFactory.decodeByteArray(imgbytes,0,imgbytes.length);
+            imageview2.setImageBitmap(bmp);
+        }
+        else
+        {
+            Toast.makeText(this.getBaseContext(), "In toast", Toast.LENGTH_SHORT).show();
+        }
+            //imageview2.setVisibility(View.INVISIBLE);
+            //bitmap=null;
     }
 
     @Override
@@ -90,7 +104,14 @@ public class NewNoteActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.save:
                 if(noteid==-2) {
-                    noteid = dbHelperClass.insertData(title.getText().toString(), note.getText().toString(), null);
+                    if(bitmap != null ) {
+                        String picpath = getStringImage(bitmap);
+                        noteid = dbHelperClass.insertData(title.getText().toString(), note.getText().toString(), picpath);
+                    }
+                    else
+                    {
+                        noteid = dbHelperClass.insertData(title.getText().toString(), note.getText().toString(), "");
+                    }
                     //Add picpath and imageview for images
                     if(noteid!=-1)
                         Toast.makeText(NewNoteActivity.this, "Note Saved Successfully", Toast.LENGTH_LONG).show();
@@ -99,7 +120,7 @@ public class NewNoteActivity extends AppCompatActivity {
                 }
                 else
                 {
-                    if(dbHelperClass.updateData(Integer.parseInt(Long.toString(noteid)),title.getText().toString(), note.getText().toString(), null))
+                    if(dbHelperClass.updateData(Integer.parseInt(Long.toString(noteid)),title.getText().toString(), note.getText().toString(), ""))
                     {
                         Toast.makeText(NewNoteActivity.this, "Note Saved Successfully", Toast.LENGTH_LONG).show();
                     }
@@ -240,7 +261,7 @@ public class NewNoteActivity extends AppCompatActivity {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] imageBytes = baos.toByteArray();
-        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
         return encodedImage;
     }
 
