@@ -60,6 +60,7 @@ public class NewNoteActivity extends AppCompatActivity {
         prevnote="";
         prevTitle="";
         previmage="";
+        imageview2.setVisibility(View.INVISIBLE);
         if(getIntent().hasExtra(ARG_ITEM_ID))
         {
             noteid = Integer.parseInt(getIntent().getStringExtra(ARG_ITEM_ID));
@@ -80,17 +81,17 @@ public class NewNoteActivity extends AppCompatActivity {
         title.setText(prevTitle);
         note.setText(prevnote);
         if (!previmage.equals("")) {
-
+            imageview2.setVisibility(View.VISIBLE);
             byte[] imgbytes = Base64.decode(previmage,Base64.NO_WRAP);
             Bitmap bmp = BitmapFactory.decodeByteArray(imgbytes,0,imgbytes.length);
             imageview2.setImageBitmap(bmp);
         }
         else
         {
-            Toast.makeText(this.getBaseContext(), "In toast", Toast.LENGTH_SHORT).show();
+            imageview2.setVisibility(View.INVISIBLE);
+            bitmap=null;
         }
-            //imageview2.setVisibility(View.INVISIBLE);
-            //bitmap=null;
+
     }
 
     @Override
@@ -120,14 +121,27 @@ public class NewNoteActivity extends AppCompatActivity {
                 }
                 else
                 {
-                    if(dbHelperClass.updateData(Integer.parseInt(Long.toString(noteid)),title.getText().toString(), note.getText().toString(), ""))
-                    {
-                        Toast.makeText(NewNoteActivity.this, "Note Saved Successfully", Toast.LENGTH_LONG).show();
+
+                    if(bitmap != null ) {
+                        String picpath = getStringImage(bitmap);
+                        if(dbHelperClass.updateData(Integer.parseInt(Long.toString(noteid)),title.getText().toString(), note.getText().toString(), picpath))
+                        {
+                            Toast.makeText(NewNoteActivity.this, "Note Saved Successfully", Toast.LENGTH_LONG).show();
+                        }
+                        else
+                            Toast.makeText(NewNoteActivity.this, "Note update failed", Toast.LENGTH_LONG).show();
                     }
                     else
-                        Toast.makeText(NewNoteActivity.this, "Note update failed", Toast.LENGTH_LONG).show();
-
+                    {
+                        if(dbHelperClass.updateData(Integer.parseInt(Long.toString(noteid)),title.getText().toString(), note.getText().toString(), ""))
+                        {
+                            Toast.makeText(NewNoteActivity.this, "Note Saved Successfully", Toast.LENGTH_LONG).show();
+                        }
+                        else
+                            Toast.makeText(NewNoteActivity.this, "Note update failed", Toast.LENGTH_LONG).show();
+                    }
                 }
+
                 break;
 
             case R.id.undo: setToPrevText();
@@ -179,6 +193,7 @@ public class NewNoteActivity extends AppCompatActivity {
 
             file = new File(imgDecodableString);
             try {
+
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 // downsizing image as it throws OutOfMemory Exception for larger
                 // images
@@ -189,7 +204,7 @@ public class NewNoteActivity extends AppCompatActivity {
                 //bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
                 //Setting the Bitmap to ImageView
                 imageview2.setImageBitmap(bitmap);
-
+                imageview2.setVisibility(View.VISIBLE);
             }
             catch(NullPointerException e)
             {
