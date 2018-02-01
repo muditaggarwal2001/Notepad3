@@ -14,7 +14,6 @@ import com.example.mudit.notepad.dummy.DummyContent;
 /**
  * A fragment representing a single note detail screen.
  * This fragment is either contained in a {@link noteListActivity}
- * in two-pane mode (on tablets) or a {@link noteDetailActivity}
  * on handsets.
  */
 public class noteDetailFragment extends Fragment {
